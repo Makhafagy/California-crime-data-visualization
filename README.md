@@ -1,4 +1,4 @@
-# California-crime-data-visualization
+# California-house-prices-prediction
 
 ## Project Overview
 The objective of this data visualization project is to explore the potential correlation between variables like crime rates and house prices in California. The project aims to answer the question of whether areas with higher crime rates tend to have lower house prices, and vice versa.
