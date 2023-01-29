@@ -1,11 +1,13 @@
 # California-crime-data-visualization
 
 ## Project Overview
-The objective of this data visualization project is to explore the potential correlation between crime rates and house prices in California. The project aims to answer the question of whether areas with higher crime rates tend to have lower house prices, and vice versa.
+The objective of this data visualization project is to explore the potential correlation between variables like crime rates and house prices in California. The project aims to answer the question of whether areas with higher crime rates tend to have lower house prices, and vice versa.
 
 To accomplish this, the project utilizes data from two sources: the California Department of Justice and Zillow. The crime data includes information on various crime types such as burglary, theft, and assault, as well as the location of the incidents. The housing data includes information on median home prices, home values, and the number of homes sold.
 
 The data is then cleaned and merged to create a comprehensive dataset that includes both crime and housing information for various cities in California. This dataset is then used to create various visualizations such as scatter plots, line charts, and heat maps to better understand the relationship between crime rates and house prices.
+
+Additionally, other variables such as population density, median income, and education level will also be taken into consideration in the future to see if they have any impact on house prices.
 
 ## Data Cleaning and Preparation
 The first step in the project was to gather and clean the data. The crime data was obtained from the California Department of Justice and required some cleaning to remove any irrelevant information and ensure that the data was consistent. The housing data was obtained from Zillow and also required cleaning to ensure that it was in a format that could be easily merged with the crime data.
