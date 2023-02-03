@@ -160,4 +160,28 @@ cols.insert(2, cols.pop(cols.index('state')))
 # reindex the dataframe with the new column order
 combined_data = combined_data.reindex(columns=cols)
 
+# Get the values of the "city" column:
+city = combined_data["city"].values
+
+# Create a new column 'report_year_diff' to store the difference between consecutive values in the 'report_year' column:
+combined_data['report_year_diff'] = combined_data['report_year'].diff()
+
+# drop instances where city is repeated throughout the same report_year
+mask = combined_data['report_year_diff'] == 0
+combined_data.drop(combined_data[mask].index, inplace=True)
+
+# drop instances where 2013_price_avg = 0, 
+# efficient way to check if the entire city has 0 price avg throughout all years 2000-2013
+mask = combined_data['2013_price_avg'] == 0
+combined_data.drop(combined_data[mask].index, inplace=True)
+
+# drop report_year_diff since we don't need that column anymore
+combined_data = combined_data.drop(columns=['report_year_diff'], axis=1)
+
+# Save the clean optimized DataFrame to a .csv file:
+combined_data.to_csv('california_clean.csv', index=False)
+
+# Reindex the DataFrame:
+combined_data = combined_data.reset_index(drop=True)
+
 print(combined_data)
