@@ -42,11 +42,9 @@ Install Python, pip, Visual Studio Code.
 ### Dependencies
 Install required dependencies:
 ```
-pip install pandas
+pip install -r requirements.txt 
 ```
-```
-pip install numpy
-```
+
 ### How To Run
 ```
 python california.py
