@@ -1,7 +1,10 @@
 # California-house-prices-prediction
 ## Current data covers years (2000-2013)
 
-## Project Overview
+## Project Purpose
+The project provides valuable insights into the relationship between crime rates and house prices in California. The data visualizations created in this project can be used by potential home buyers, real estate agents, and city planners to make more informed decisions. This can include identifying areas where home prices may be undervalued due to high crime rates, or areas where crime may be a concern for potential home buyers. Additionally, this project can be used as a starting point for further research and analysis on the topic.
+
+## Overview
 The objective of this data visualization project is to explore the potential correlation between variables like crime rates and house prices in California. The project aims to answer the question of whether areas with higher crime rates tend to have lower house prices, and vice versa.
 
 To accomplish this, the project utilizes data from two sources: the California Department of Justice and Zillow. The crime data includes information on various crime types such as burglary, theft, and assault, as well as the location of the incidents. The housing data includes information on median home prices, home values, and the number of homes sold.
@@ -20,12 +23,16 @@ After cleaning and merging the data, the project then moved on to the data analy
 There is a clear relationship between crime rates and house prices in California. Cities with higher crime rates tend to have lower house prices, and vice versa. However, this relationship is not always linear and can vary depending on the type of crime and the location.
 
 ## Results
-In Progress.
+We used Seaborn's FacetGrid and regplot functions to create scatterplots that showed the relationship between crime rates and average house prices for each year in the data set. We also drew a line of regression to determine the correlation between the two variables.
+
+After analyzing the data, we found that there was no clear correlation between crime rates and house prices in California. The scatterplots showed a weak, scattered relationship between the two variables, and the lines of regression had low slope values and poor R-squared values.
+
+This result suggests that crime rates do not have a significant impact on house prices in California. Other factors, such as the local economy, housing supply, and demand, likely have a greater influence on house prices in the state.
 
 ## Conclusion
-In Progress.
+This study provides evidence that there is no significant correlation between crime rates and house prices in California.
 
-But I hope the project provides valuable insights into the relationship between crime rates and house prices in California. The data visualizations created in this project can be used by potential home buyers, real estate agents, and city planners to make more informed decisions. This can include identifying areas where home prices may be undervalued due to high crime rates, or areas where crime may be a concern for potential home buyers. Additionally, this project can be used as a starting point for further research and analysis on the topic.
+More conclusions are to come as we take other variables into consideration.
 
 ## Getting Started
 
