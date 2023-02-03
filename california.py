@@ -5,16 +5,11 @@ crime_data = pd.read_csv("california_crimes.csv", low_memory=False)
 housing_data = pd.read_csv("california_housing_prices.csv")
 
 # rename RegionName to City, so we can inner join crime and housing data
-crime_data = crime_data.rename(columns={'geoname': 'city', 'rate':'crime_rate', 'reportyear':'report_year'})
-# print(crime_data)
+crime_data = crime_data.rename(columns={'geoname': 'city', 'rate':'crime_rate', 'reportyear':'crime_report_year',
+                                        'numerator':'criminals_population', 'denominator':'all_population'})
 
 # rename RegionName to City, so we can inner join crime and housing data
 housing_data = housing_data.rename(columns={'RegionName': 'city', 'RegionID': 'region_id', 'SizeRank':'size_rank'})
-
-
-# extract the year and group by it
-#housing_data = housing_data.groupby(housing_data[['1/31/2022','2/28/2022','3/31/2022','4/30/2022','5/31/2022','6/30/2022','7/31/2022',
-#                                                  '8/31/2022','9/30/2022','10/31/2022','11/30/2022','12/31/2022']].dt.year, axis=1).sum()
 
 not_date_columns = ['region_id','size_rank','city','RegionType','StateName','State','Metro','CountyName']
 
@@ -62,10 +57,10 @@ crime_data3.reset_index(level=0, inplace=True)
 # so we can inner join later
 crime_data3.dropna(subset=['county_name'], inplace=True)
 
-for col in housing_data3.select_dtypes(include=[np.float]):
+for col in housing_data3.select_dtypes(include=[np.float64]):
     housing_data3[col] = housing_data3[col].fillna(0).astype(np.int64)
 
-for col in crime_data3.select_dtypes(include=[np.float]):
+for col in crime_data3.select_dtypes(include=[np.float64]):
     if col != 'crime_rate':
         crime_data3[col] = crime_data3[col].fillna(0).astype(np.int64)
     
@@ -111,17 +106,8 @@ crime_data2 = crime_data2.assign(city=crime_data3['city'], county_name=crime_dat
 
 crime_data2 = crime_data2.drop(columns=['race_eth_code', 'strata_name_code', 'county_fips', 'ca_decile',
                                         'ca_rr', 'll_95ci', 'rse', 'se', 'ul_95ci', 'index', 'geotypevalue',
-                                        'region_code'], axis=1)
+                                        'region_code', 'dof_population'], axis=1)
 
-# print(housing_data2)
-# print(crime_data2)
-
-#print(cols)
-# date_housing_data = date_housing_data.groupby(date_housing_data.columns, axis=1)
-#print(housing_data)
-#print(crime_data)
-
-# print(housing_data2['city'])
 housing_data2['county_name'] = housing_data2['county_name'].replace(to_replace=' County', value='', regex=True)
 housing_data2['city'] = housing_data2['city'].replace(to_replace=' City', value='', regex=True)
 
@@ -130,14 +116,13 @@ crime_data2['city'] = crime_data2['city'].replace(to_replace=' city', value='', 
 
 crime_data2.drop("city", axis=1, inplace=True)
 
-print(housing_data2)
-print(crime_data2)
-
-print(crime_data2['strata_level_name_code'])
+# print(housing_data2)
+# print(crime_data2)
+# print(crime_data2['strata_level_name_code'])
 
 #inner join both crime and housing datasets
 combined_data = pd.merge(crime_data2, housing_data2, on='county_name', how='inner')
-combined_data.info()
+# combined_data.info()
 if combined_data.empty:
     print("The DataFrame is empty.")
 
@@ -145,10 +130,10 @@ if combined_data.empty:
 # get the current column order
 cols = combined_data.columns.tolist()
 
-mask = combined_data['numerator'] == 0
+mask = combined_data['criminals_population'] == 0
 combined_data.drop(combined_data[mask].index, inplace=True)
 
-mask = combined_data['denominator'] == 0
+mask = combined_data['all_population'] == 0
 combined_data.drop(combined_data[mask].index, inplace=True)
 combined_data.reset_index(inplace=True)
 
@@ -163,11 +148,11 @@ combined_data = combined_data.reindex(columns=cols)
 # Get the values of the "city" column:
 city = combined_data["city"].values
 
-# Create a new column 'report_year_diff' to store the difference between consecutive values in the 'report_year' column:
-combined_data['report_year_diff'] = combined_data['report_year'].diff()
+# Create a new column 'crime_report_year_diff' to store the difference between consecutive values in the 'crime_report_year' column:
+combined_data['crime_report_year_diff'] = combined_data['crime_report_year'].diff()
 
-# drop instances where city is repeated throughout the same report_year
-mask = combined_data['report_year_diff'] == 0
+# drop instances where city is repeated throughout the same crime_report_year
+mask = combined_data['crime_report_year_diff'] == 0
 combined_data.drop(combined_data[mask].index, inplace=True)
 
 # drop instances where 2013_price_avg = 0, 
@@ -175,13 +160,190 @@ combined_data.drop(combined_data[mask].index, inplace=True)
 mask = combined_data['2013_price_avg'] == 0
 combined_data.drop(combined_data[mask].index, inplace=True)
 
-# drop report_year_diff since we don't need that column anymore
-combined_data = combined_data.drop(columns=['report_year_diff'], axis=1)
+# drop crime_report_year_diff since we don't need that column anymore
+combined_data = combined_data.drop(columns=['crime_report_year_diff'], axis=1)
 
-# Save the clean optimized DataFrame to a .csv file:
-combined_data.to_csv('california_clean.csv', index=False)
+condition_2000 = (combined_data['crime_report_year'] == 2000)
+condition_2001 = (combined_data['crime_report_year'] == 2001)
+condition_2002 = (combined_data['crime_report_year'] == 2002)
+condition_2003 = (combined_data['crime_report_year'] == 2003)
+condition_2004 = (combined_data['crime_report_year'] == 2004)
+condition_2005 = (combined_data['crime_report_year'] == 2005)
+condition_2006 = (combined_data['crime_report_year'] == 2006)
+condition_2007 = (combined_data['crime_report_year'] == 2007)
+condition_2008 = (combined_data['crime_report_year'] == 2008)
+condition_2009 = (combined_data['crime_report_year'] == 2009)
+condition_2010 = (combined_data['crime_report_year'] == 2010)
+condition_2011 = (combined_data['crime_report_year'] == 2011)
+condition_2012 = (combined_data['crime_report_year'] == 2012)
+condition_2013 = (combined_data['crime_report_year'] == 2013)
+
+date_columns=['2000_price_avg', '2001_price_avg', '2002_price_avg', '2003_price_avg', '2004_price_avg', '2005_price_avg', '2006_price_avg', 
+              '2007_price_avg', '2008_price_avg', '2009_price_avg', '2010_price_avg', '2011_price_avg', '2012_price_avg', '2013_price_avg']
+
+# Create the new column 'D'
+combined_data['price_avg_this_year'] = 0
+if condition_2000.any():
+    if '2000_price_avg' in date_columns:
+        date_columns.remove('2000_price_avg')
+    combined_data.loc[condition_2000, date_columns] = 0
+    date_columns.append('2000_price_avg')
+    
+if condition_2001.any():
+    if '2001_price_avg' in date_columns:
+        date_columns.remove('2001_price_avg')
+    combined_data.loc[condition_2001, date_columns] = 0
+    date_columns.append('2001_price_avg')
+    
+if condition_2002.any():
+    if '2002_price_avg' in date_columns:
+        date_columns.remove('2002_price_avg')
+    combined_data.loc[condition_2002, date_columns] = 0
+    date_columns.append('2002_price_avg')
+    
+if condition_2003.any():
+    if '2003_price_avg' in date_columns:
+        date_columns.remove('2003_price_avg')
+    combined_data.loc[condition_2003, date_columns] = 0
+    date_columns.append('2003_price_avg')
+    
+if condition_2004.any():
+    if '2004_price_avg' in date_columns:
+        date_columns.remove('2004_price_avg')
+    combined_data.loc[condition_2004, date_columns] = 0
+    date_columns.append('2004_price_avg')
+    
+if condition_2005.any():
+    if '2005_price_avg' in date_columns:
+        date_columns.remove('2005_price_avg')
+    combined_data.loc[condition_2005, date_columns] = 0
+    date_columns.append('2005_price_avg')
+    
+if condition_2006.any():
+    if '2006_price_avg' in date_columns:
+        date_columns.remove('2006_price_avg')
+    combined_data.loc[condition_2006, date_columns] = 0
+    date_columns.append('2006_price_avg')
+    
+if condition_2007.any():
+    if '2007_price_avg' in date_columns:
+        date_columns.remove('2007_price_avg')
+    combined_data.loc[condition_2007, date_columns] = 0
+    date_columns.append('2007_price_avg')
+    
+if condition_2008.any():
+    if '2008_price_avg' in date_columns:
+        date_columns.remove('2008_price_avg')
+    combined_data.loc[condition_2008, date_columns] = 0
+    date_columns.append('2008_price_avg')
+    
+if condition_2009.any():
+    if '2009_price_avg' in date_columns:
+        date_columns.remove('2009_price_avg')
+    combined_data.loc[condition_2009, date_columns] = 0
+    date_columns.append('2009_price_avg')
+    
+if condition_2010.any():
+    if '2010_price_avg' in date_columns:
+        date_columns.remove('2010_price_avg')
+    combined_data.loc[condition_2010, date_columns] = 0
+    date_columns.append('2010_price_avg')
+    
+if condition_2011.any():
+    if '2011_price_avg' in date_columns:
+        date_columns.remove('2011_price_avg')
+    combined_data.loc[condition_2011, date_columns] = 0
+    date_columns.append('2011_price_avg')
+    
+if condition_2012.any():
+    if '2012_price_avg' in date_columns:
+        date_columns.remove('2012_price_avg')
+    combined_data.loc[condition_2012, date_columns] = 0
+    date_columns.append('2012_price_avg')
+    
+if condition_2013.any():
+    if '2013_price_avg' in date_columns:
+        date_columns.remove('2013_price_avg')
+    combined_data.loc[condition_2013, date_columns] = 0
+    date_columns.append('2013_price_avg')
+
+    
+combined_data['price_avg_this_year'] = combined_data['2000_price_avg'] + combined_data['2001_price_avg'] + combined_data['2002_price_avg'] + combined_data[
+        '2003_price_avg'] + combined_data['2004_price_avg'] + combined_data['2005_price_avg'] + combined_data['2006_price_avg'] + combined_data[
+        '2007_price_avg'] + combined_data['2008_price_avg'] + combined_data['2009_price_avg'] + combined_data['2010_price_avg'] + combined_data[
+        '2011_price_avg'] + combined_data['2012_price_avg'] + combined_data['2013_price_avg']
+
+mask = combined_data['price_avg_this_year'] == 0
+combined_data.drop(combined_data[mask].index, inplace=True)
+
+# date_columns=['2000_price_avg', '2001_price_avg', '2002_price_avg', '2003_price_avg', '2004_price_avg', '2005_price_avg', '2006_price_avg', 
+#               '2007_price_avg', '2008_price_avg', '2009_price_avg', '2010_price_avg', '2011_price_avg', '2012_price_avg', '2013_price_avg']
+
+# for column in combined_data.columns:
+#     if column in date_columns:
+#         if condition_2000.any():
+#             if '2000_price_avg' in date_columns:
+#                 date_columns.remove('2000_price_avg')
+#             combined_data.loc[condition_2000.any(), date_columns] = 0
+#         elif condition_2001.any():
+#             if '2001_price_avg' in date_columns:
+#                 date_columns.remove('2001_price_avg')
+#             combined_data.loc[condition_2001, date_columns] = 0
+#         elif condition_2002.any():
+#             if '2002_price_avg' in date_columns:
+#                 date_columns.remove('2002_price_avg')
+#             combined_data.loc[condition_2002, date_columns] = 0
+#         elif condition_2003.any():
+#             if '2003_price_avg' in date_columns:
+#                 date_columns.remove('2003_price_avg')
+#             combined_data.loc[condition_2003, date_columns] = 0
+#         elif condition_2004.any():
+#             if '2004_price_avg' in date_columns:
+#                 date_columns.remove('2004_price_avg')
+#             combined_data.loc[condition_2004, date_columns] = 0
+#         elif condition_2005.any():
+#             if '2005_price_avg' in date_columns:
+#                 date_columns.remove('2005_price_avg')
+#             combined_data.loc[condition_2005, date_columns] = 0
+#         elif condition_2006.any():
+#             if '2006_price_avg' in date_columns:
+#                 date_columns.remove('2006_price_avg')
+#             combined_data.loc[condition_2006, date_columns] = 0
+#         elif condition_2007.any():
+#             if '2007_price_avg' in date_columns:
+#                 date_columns.remove('2007_price_avg')
+#             combined_data.loc[condition_2007, date_columns] = 0
+#         elif condition_2008.any():
+#             if '2008_price_avg' in date_columns:
+#                 date_columns.remove('2008_price_avg')
+#             combined_data.loc[condition_2008, date_columns] = 0
+#         elif condition_2009.any():
+#             if '2009_price_avg' in date_columns:
+#                 date_columns.remove('2009_price_avg')
+#             combined_data.loc[condition_2009, date_columns] = 0
+#         elif condition_2010.any():
+#             if '2010_price_avg' in date_columns:
+#                 date_columns.remove('2010_price_avg')
+#             combined_data.loc[condition_2010, date_columns] = 0
+#         elif condition_2011.any():
+#             if '2011_price_avg' in date_columns:
+#                 date_columns.remove('2011_price_avg')
+#             combined_data.loc[condition_2011, date_columns] = 0
+#         elif condition_2012.any():
+#             if '2012_price_avg' in date_columns:
+#                 date_columns.remove('2012_price_avg')
+#             combined_data.loc[condition_2012, date_columns] = 0
+#         elif condition_2013.any():
+#             if '2013_price_avg' in date_columns:
+#                 date_columns.remove('2013_price_avg')
+#             combined_data.loc[condition_2013, date_columns] = 0
 
 # Reindex the DataFrame:
 combined_data = combined_data.reset_index(drop=True)
 
+# Save the clean optimized DataFrame to a .csv file:
+combined_data.to_csv('california_clean.csv', index=False)
+
 print(combined_data)
+# Replace values in columns 'A' and 'B' where the condition_2000 is True
+# combined_data.loc[condition_2000, ['A', 'B']] = 0
