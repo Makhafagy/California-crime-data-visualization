@@ -26,6 +26,7 @@ There is a clear relationship between crime rates and house prices in California
 We used Seaborn's FacetGrid and regplot functions to create scatterplots that showed the relationship between crime rates and average house prices for each year in the data set. We also drew a line of regression to determine the correlation between the two variables.
 
 After analyzing the data, we found that there was no clear correlation between crime rates and house prices in California. The scatterplots showed a weak, scattered relationship between the two variables, and the lines of regression had low slope values and poor R-squared values.
+![image](https://user-images.githubusercontent.com/52415396/216567057-9220aeb2-c699-42d8-84eb-6e0a14159a99.png)
 
 This result suggests that crime rates do not have a significant impact on house prices in California. Other factors, such as the local economy, housing supply, and demand, likely have a greater influence on house prices in the state.
 
