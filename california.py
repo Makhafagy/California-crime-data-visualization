@@ -45,11 +45,10 @@ for column in housing_data.columns:
             housing_data = housing_data.rename(columns={column: '2013_price_avg'})
         else:
             housing_data = housing_data.drop(labels=column, axis=1)
-
 housing_data3 = housing_data
 housing_data3.fillna(0)
-
 crime_data3 = crime_data
+
 mask = crime_data3['strata_level_name_code'] != 5
 crime_data3.drop(crime_data3[mask].index, inplace=True)
 crime_data3.reset_index(level=0, inplace=True)
@@ -63,10 +62,8 @@ for col in housing_data3.select_dtypes(include=[np.float64]):
 for col in crime_data3.select_dtypes(include=[np.float64]):
     if col != 'crime_rate':
         crime_data3[col] = crime_data3[col].fillna(0).astype(np.int64)
-    
 housing_data2 = housing_data3
 crime_data2 = crime_data3
-
 
 if housing_data2.empty:
     print("The DataFrame is empty.")
@@ -91,19 +88,11 @@ for col in crime_data2.columns:
     if crime_data2[col].dtype == 'int64' and col != 'crime_rate':
         crime_data2[col] = np.ceil(crime_data2[col]).astype(int)
 
-cols = housing_data2.columns.tolist()
-#print(cols)
-
-cols = crime_data2.columns.tolist()
-#print(cols)
-
 housing_data2 = housing_data2.assign(city=housing_data3['city'],state=housing_data3['State'],
                                      county_name=housing_data3['CountyName'])
-
 housing_data2 = housing_data2.drop(columns=['size_rank', 'region_id'], axis=1)
 
 crime_data2 = crime_data2.assign(city=crime_data3['city'], county_name=crime_data3['county_name'])
-
 crime_data2 = crime_data2.drop(columns=['race_eth_code', 'strata_name_code', 'county_fips', 'ca_decile',
                                         'ca_rr', 'll_95ci', 'rse', 'se', 'ul_95ci', 'index', 'geotypevalue',
                                         'region_code', 'dof_population'], axis=1)
@@ -113,15 +102,11 @@ housing_data2['city'] = housing_data2['city'].replace(to_replace=' City', value=
 
 crime_data2['county_name'] = crime_data2['county_name'].replace(to_replace=' County', value='', regex=True)
 crime_data2['city'] = crime_data2['city'].replace(to_replace=' city', value='', regex=True)
-
 crime_data2.drop("city", axis=1, inplace=True)
-
-# print(housing_data2)
-# print(crime_data2)
-# print(crime_data2['strata_level_name_code'])
 
 #inner join both crime and housing datasets
 combined_data = pd.merge(crime_data2, housing_data2, on='county_name', how='inner')
+
 # combined_data.info()
 if combined_data.empty:
     print("The DataFrame is empty.")
@@ -276,68 +261,6 @@ combined_data['price_avg_this_year'] = combined_data['2000_price_avg'] + combine
 mask = combined_data['price_avg_this_year'] == 0
 combined_data.drop(combined_data[mask].index, inplace=True)
 
-# date_columns=['2000_price_avg', '2001_price_avg', '2002_price_avg', '2003_price_avg', '2004_price_avg', '2005_price_avg', '2006_price_avg', 
-#               '2007_price_avg', '2008_price_avg', '2009_price_avg', '2010_price_avg', '2011_price_avg', '2012_price_avg', '2013_price_avg']
-
-# for column in combined_data.columns:
-#     if column in date_columns:
-#         if condition_2000.any():
-#             if '2000_price_avg' in date_columns:
-#                 date_columns.remove('2000_price_avg')
-#             combined_data.loc[condition_2000.any(), date_columns] = 0
-#         elif condition_2001.any():
-#             if '2001_price_avg' in date_columns:
-#                 date_columns.remove('2001_price_avg')
-#             combined_data.loc[condition_2001, date_columns] = 0
-#         elif condition_2002.any():
-#             if '2002_price_avg' in date_columns:
-#                 date_columns.remove('2002_price_avg')
-#             combined_data.loc[condition_2002, date_columns] = 0
-#         elif condition_2003.any():
-#             if '2003_price_avg' in date_columns:
-#                 date_columns.remove('2003_price_avg')
-#             combined_data.loc[condition_2003, date_columns] = 0
-#         elif condition_2004.any():
-#             if '2004_price_avg' in date_columns:
-#                 date_columns.remove('2004_price_avg')
-#             combined_data.loc[condition_2004, date_columns] = 0
-#         elif condition_2005.any():
-#             if '2005_price_avg' in date_columns:
-#                 date_columns.remove('2005_price_avg')
-#             combined_data.loc[condition_2005, date_columns] = 0
-#         elif condition_2006.any():
-#             if '2006_price_avg' in date_columns:
-#                 date_columns.remove('2006_price_avg')
-#             combined_data.loc[condition_2006, date_columns] = 0
-#         elif condition_2007.any():
-#             if '2007_price_avg' in date_columns:
-#                 date_columns.remove('2007_price_avg')
-#             combined_data.loc[condition_2007, date_columns] = 0
-#         elif condition_2008.any():
-#             if '2008_price_avg' in date_columns:
-#                 date_columns.remove('2008_price_avg')
-#             combined_data.loc[condition_2008, date_columns] = 0
-#         elif condition_2009.any():
-#             if '2009_price_avg' in date_columns:
-#                 date_columns.remove('2009_price_avg')
-#             combined_data.loc[condition_2009, date_columns] = 0
-#         elif condition_2010.any():
-#             if '2010_price_avg' in date_columns:
-#                 date_columns.remove('2010_price_avg')
-#             combined_data.loc[condition_2010, date_columns] = 0
-#         elif condition_2011.any():
-#             if '2011_price_avg' in date_columns:
-#                 date_columns.remove('2011_price_avg')
-#             combined_data.loc[condition_2011, date_columns] = 0
-#         elif condition_2012.any():
-#             if '2012_price_avg' in date_columns:
-#                 date_columns.remove('2012_price_avg')
-#             combined_data.loc[condition_2012, date_columns] = 0
-#         elif condition_2013.any():
-#             if '2013_price_avg' in date_columns:
-#                 date_columns.remove('2013_price_avg')
-#             combined_data.loc[condition_2013, date_columns] = 0
-
 # Reindex the DataFrame:
 combined_data = combined_data.reset_index(drop=True)
 
@@ -345,5 +268,3 @@ combined_data = combined_data.reset_index(drop=True)
 combined_data.to_csv('california_clean.csv', index=False)
 
 print(combined_data)
-# Replace values in columns 'A' and 'B' where the condition_2000 is True
-# combined_data.loc[condition_2000, ['A', 'B']] = 0
